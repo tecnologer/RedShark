@@ -1,0 +1,91 @@
+.canciones{
+	background: #836953;
+	height: 30px;
+	width: 100%;
+	overflow: hidden;
+}
+
+.fotos{
+	background: #77DD77;
+	height: 600px;
+	width: 100%;
+	border: 0;
+	overflow: hidden;
+	text-align: center;
+	vertical-align: center;
+}
+
+#div_fotos{
+	vertical-align: middle !important; 
+	float:none !important;
+	height: 100% !important;
+	width: 100% !important;
+	text-align: center !important;
+}
+
+.back, .play, .pause, .next, .stop, #div_reload, .shuffle_off, .shuffle_on, .repeat_off, .repeat_all, .repeat_one{
+	display: block;
+    background: url(../img/sprite.png) no-repeat;
+    height: 30px;
+    width: 47px;
+	float: left;
+    cursor: pointer; 
+    cursor: hand;
+}
+
+#div_reload{
+	background-position: -320px 0px;
+	width: 30px !important;
+}
+
+.shuffle_off{
+	background-position:-352px 0px;
+	width: 30px !important;
+}
+.shuffle_on{
+	background-position:-384px 0px;
+	width: 30px !important;
+}
+
+.mensaje{
+	background-position: -248px 0px;
+	margin-right: -30px;
+	width: 32px !important;
+}
+
+.back {    
+    background-position: 0px 0px;
+}
+
+.play {
+	background-position: -47px 0px;
+}
+
+.pause {
+	background-position: -99px 0px;
+}
+
+.stop {
+	background-position: -150px 0px;
+}
+
+.next {
+	background-position: -199px 0px;
+}
+
+.repeat_off{
+	background-position: -414px 0px;
+}
+
+.repeat_all{
+	background-position: -458px 0px;
+}
+
+.repeat_one{
+	background-position: -502px 0px;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	font-size: 12pt;
+}
