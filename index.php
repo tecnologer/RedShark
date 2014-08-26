@@ -94,28 +94,12 @@
 					<td><input type="button" value="Subir" onclick="ajaxFileUpload();"></td>
 				</tr>
 			</table>
+
+			<div id="footer">
+				<span style="float:left;width:250px;"><b>Author:</b> Rey David Dominguez<br></span>
+				<span style="float:right;width:280px;"><b>&nbsp;&nbsp;Email:</b> <a href="mailto:rdominguez@tecnologer.net">rdominguez@tecnologer.net</a></span>
+				<br><span style="float:none;width:280px;"><b>Version:</a>&nbsp;0.0.1</span>
+			</div>
 		</form>
-		
-		<!-- <form name="form2" action="" method="POST" enctype="multipart/form-data">
-		<table cellpadding="0" cellspacing="0" class="tableForm">
-
-		<thead>
-			<tr>
-				<th>Please select a file and click Upload button</th>
-			</tr>
-		</thead>
-		<tbody>	
-			<tr>
-				<td><input id="fileToUpload" type="file" size="45" name="fileToUpload" class="input"></td>			</tr>
-
-		</tbody>
-			<tfoot>
-				<tr>
-					<td><button class="button" id="buttonUpload" onclick="return ajaxFileUpload();">Upload</button></td>
-				</tr>
-			</tfoot>
-	
-	</table>
-		</form> -->
 	</body>
 </html>

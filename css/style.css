@@ -89,3 +89,11 @@ body {
 	font-family: Arial, sans-serif;
 	font-size: 12pt;
 }
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 644px;
+    height: 40px;
+    margin: 0 auto;
+}
