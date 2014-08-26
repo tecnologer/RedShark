@@ -1,6 +1,9 @@
 RedShark
 ========
 
+Author: Rey David Dominguez
+Email: rdominguez@tecnologer.net
+
 Reproductor de musica
 
 Es un pequeño reproductor de musica, aun faltan muchas cosas por agregar y mejorar.
