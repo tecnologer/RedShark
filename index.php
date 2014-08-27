@@ -38,16 +38,21 @@
 			</table>
 			<br>
 			<br>
-			<div>				
-				Accesos directos del teclado
-				<ul>
-					<li type="disc"><b>Espacio:</b> Play/Pause</li>
-					<li type="disc"><b>F2:</b> Refrescar lista</li>
-					<li type="disc"><b>N:</b> Canci&oacute;n siguiente</li>
-					<li type="disc"><b>B:</b> Canci&oacute;n anterior</li>
-				</ul>
+			<div>
+				<div id="hotKey" class="hotkey">				
+					Accesos directos del teclado
+					<ul>
+						<li type="disc"><b>Espacio:</b> Play/Pause</li>
+						<li type="disc"><b>F2:</b> Refrescar lista</li>
+						<li type="disc"><b>N:</b> Canci&oacute;n siguiente</li>
+						<li type="disc"><b>B:</b> Canci&oacute;n anterior</li>
+					</ul>
+				</div>
+				<div id="listaCanciones" class="songList">
+				</div>
 			</div>
 			<br>
+			<div style="float:none;">
 			<table>
 				<tr  class="td_archivo">
 					<td>Archivo:</td>
@@ -94,11 +99,12 @@
 					<td><input type="button" value="Subir" onclick="ajaxFileUpload();"></td>
 				</tr>
 			</table>
+			</div>
 
 			<div id="footer">
-				<span style="float:left;width:250px;"><b>Author:</b> Rey David Dominguez<br></span>
-				<span style="float:right;width:280px;"><b>&nbsp;&nbsp;Email:</b> <a href="mailto:rdominguez@tecnologer.net">rdominguez@tecnologer.net</a></span>
-				<br><span style="float:none;width:280px;"><b>Version:</a>&nbsp;0.0.1</span>
+				<span style="float:left;width:250px;"><b>Author:</b> Rey David Dominguez<br></span><br>
+				<span style="float:right;width:150px;"><b>Version:</a>&nbsp;0.0.2</span>
+				<span style="float:none;width:280px;"><b>&nbsp;&nbsp;Email:</b> <a href="mailto:rdominguez@tecnologer.net">rdominguez@tecnologer.net</a></span>
 			</div>
 		</form>
 	</body>

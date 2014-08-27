@@ -13,6 +13,9 @@ var $shuffleSong=[];
 
 var $timer="";
 
+/*Author: REY DAVID DOMINGUEZ
+	Constructor
+*/
 function __init__()
 {
 	getSongs();
@@ -79,6 +82,9 @@ function __init__()
 
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Muestra la lista de reproduccion
+*/
 function getSongs()
 {
 	$.ajax({
@@ -86,11 +92,15 @@ function getSongs()
         url:   'componentes/funciones/ObtenerCanciones.php',
         type:  'post',
         success:  function (data) {                
-                $audios=$.parseJSON(data);
+            $audios=$.parseJSON(data);
+            showList();
         }
 	});
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Reproduce la cancion actual
+*/
 function playSong(_repeat)
 {
 	var $tid;
@@ -101,6 +111,9 @@ function playSong(_repeat)
 			$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 			$('#tag_audio').load();
 		}
+
+		var anterior=$actualSong;
+		markSongOfList(anterior);
 
 	 	$('#tag_audio')[0].play();
 	 	showDataSong();
@@ -121,6 +134,8 @@ function playSong(_repeat)
 	 	$( "#id_play" ).addClass( "pause" );
 		$( "#id_play" ).attr( "title","Pausar canci\u00F3n." );
 
+		var anterior=$actualSong;
+		markSongOfList(anterior);
 	 	// $tid = setInterval(isPaused(), 2000);
 	}
 	else
@@ -134,15 +149,24 @@ function playSong(_repeat)
 	}
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Verifica si la reproduccion se pauso, y si es asi, avanza a la siguiente cancion.
+	Esto se utiliza cuando la cancion termina, el estado de la etiqueta Audio es paused
+*/
 function isPaused()
 {
 	if($('#tag_audio')[0].paused())
 		nextSong();
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Avanza a la siguiente cancion
+*/
 function nextSong()
 {
+	var anterior=$actualSong;
 	getNumberSong(2);
+	markSongOfList(anterior);	
 
 	$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 	$('#tag_audio').load();
@@ -150,13 +174,16 @@ function nextSong()
 	showDataSong();
 	$( "#id_play" ).removeClass( "play" );
 	$( "#id_play" ).addClass( "pause" );
-
-
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Desplaza a la cancion anterior
+*/
 function backSong()
 {
+	var anterior=$actualSong;
 	getNumberSong(1);
+	markSongOfList(anterior);
 
 	$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 	$('#tag_audio').load();
@@ -168,6 +195,9 @@ function backSong()
 	$( "#id_play" ).addClass( "pause" );
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Muestra la informacion de la cancion actual
+*/
 function showDataSong()
 {
 	$('#nb_cancion').html($audios[$actualSong].nombre);
@@ -179,6 +209,9 @@ function showDataSong()
 		$('#nb_album').html("");
 }
 
+/*Author: REY DAVID DOMINGUEZ
+	Sube la cancion a la db
+*/
 function ajaxFileUpload()
 {
 	var $nb_cancion=$('#_nb_cancion').val();
@@ -311,26 +344,36 @@ function shuffle()
 */
 function repeat()
 {	
+	//si esta apagado
 	if($("#id_repeat").attr("class")=='repeat_off')
-	{
+	{	
+		//cambiamos para mostrar que se reproducira la lista de nuevo
 	 	$( "#id_repeat" ).attr("class","repeat_all" );
 		$( "#id_repeat" ).attr( "title","Repetir toda la lista." );
 		$repeat=1;
 	}
+	//si tiene la clase repetir todo
 	else if($("#id_repeat").attr("class")=='repeat_all')
 	{
+		//cambiamos para mostrar que se repetira la cancion actual
 	 	$( "#id_repeat" ).attr("class","repeat_one" );
 		$( "#id_repeat" ).attr( "title","Repetir cancion actual." );
 		$repeat=2;
 	}
+	//si ninguna de las anteriores
 	else
 	{
+		//apagamos la repeticion de canciones y/o lista
 	 	$( "#id_repeat" ).attr("class","repeat_off" );
 		$( "#id_repeat" ).attr( "title","No repetir." );
 		$repeat=0;
 	}
 }
 
+/*Author: REY DAVID DOMINGUEZ
+  Date: 26/08/2014
+	Calcula la cancion siguiente, si tiene shuffle encendido genera un random
+*/
 function getNumberSong(opcion)
 {
 	if($("#div_shuffle").attr("class")=='shuffle_on')
@@ -388,4 +431,74 @@ function getNumberSong(opcion)
 		$shuffleSong=[];
 	}
 
+}
+
+/*Author: REY DAVID DOMINGUEZ
+  Date: 27/08/2014
+	Muestra la lista de reproduccion
+*/
+function showList()
+{
+
+	for(var $i=0;$i<$audios.length;$i++)
+	{
+		var clase="divCancion";
+		if(($i%2)==0)
+			clase="divCancionAlt";
+
+		var $divCancion='<div id="cancion_'+$i+'" draggable="true" class="'+clase+'">'+$audios[$i].nombre+' - '+$audios[$i].artista+'</div>';
+		
+		$('#listaCanciones').append($divCancion);
+
+		// $('#cancion_'+$i).addEventListener('dragstart', handleDragStart, false);
+	}
+
+	$('div[id^="cancion_"]').dblclick(function() {
+
+		var anterior=$actualSong;
+		$actualSong=parseInt((this.id).split("_")[1]);		
+		markSongOfList(anterior);
+
+		$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
+		$('#tag_audio').load();
+		$('#tag_audio')[0].play();
+		showDataSong();
+		$( "#id_play" ).attr( "class","pause" );
+	});
+}
+
+/*Author: REY DAVID DOMINGUEZ
+  Date: 27/08/2014
+	En la lista de reproduccion, marca la cancion que se esta reproduciendo
+*/
+function markSongOfList(anterior)
+{
+	//clase para cancion normal
+	var clase="divCancion";
+	var cFondo='';
+
+	//si es un numero par, cambiamos de clase para que se marque de diferente color
+	if((anterior%2)==0)
+		clase='divCancionAlt';
+
+	//si la cancion actual es par, le ponemos fondo diferente junto con el color
+	if(($actualSong%2)==0)
+		cFondo='#E1EEf4';
+
+	//quitamos el color diferente de cancion actual a la cancion que se estaba reproduciendo
+	$('#cancion_'+anterior).attr('class',clase);
+
+	//marcamos con color diferente la cancion que se reproducira actualmente
+	$('#cancion_'+$actualSong).attr("class","divCancionPlay");
+	$('#cancion_'+$actualSong).css("background",cFondo);
+	$('#cancion_'+$actualSong).focus();
+
+	// console.log($('#cancion_'+$actualSong).position().top);
+	// $('#listaCanciones').stop().animate({ scrollTop: $('#listaCanciones')[$actualSong].scrollHeight }, 800);
+	$('#listaCanciones').stop().animate({ scrollTop: 0 }, 800);
+	$('#listaCanciones').stop().animate({ scrollTop: $('#cancion_'+$actualSong).position().top-123 }, 800);
+}
+
+function handleDragStart(){
+	console.log("Viene, viene");
 }

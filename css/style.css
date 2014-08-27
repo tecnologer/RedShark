@@ -93,7 +93,57 @@ body {
 #footer {
     position: absolute;
     bottom: 0;
-    width: 644px;
+    width: 100%;
     height: 40px;
     margin: 0 auto;
+    /*display: none;*/
+}
+
+.hotkey{
+	width: 50%;
+	height: 150px;
+	float: left;
+}
+
+.songList{
+	width: 50%;
+	height:400px;
+	float: right;
+	overflow-y:scroll;
+	cursor: pointer;
+	font: normal 15px/150% Arial, Helvetica, sans-serif; 
+  	background: #fff;
+  	border: 1px solid #006699; 
+  	-webkit-border-radius: 3px; 
+  	-moz-border-radius: 3px; 
+  	border-radius: 3px;
+  	margin-top: -150px;
+  	overflow-x: hidden;
+}
+
+.divCancion, .divCancionAlt, .divCancionPlay { 
+  color: #00557F; 
+  border-left: 1px solid #E1EEF4;
+  font-size: 12px;
+  font-weight: normal; 
+}
+
+.divCancion:hover { 
+	background: #b9c9fe;
+}
+
+.divCancionAlt{ 
+  background: #E1EEf4; 
+  color: #00557F; 
+}
+.divCancionAlt:hover { 
+	background: #b9c9fe;
+}
+
+.divCancionPlay { 
+  color: #FF0000;
+  font: bold 15px/150% Arial, Helvetica, sans-serif; 
+}
+.divCancionPlay:hover { 
+	background: #b9c9fe;
 }
