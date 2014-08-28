@@ -4,7 +4,7 @@ RedShark
 NOTA: no subir las canciones al repositorio, subir la carpeta audio_php vacia
 
 Author: Rey David Dominguez
-Email: rdominguez@tecnologer.net
+<bR>Email: rdominguez@tecnologer.net
 
 Reproductor de musica
 
