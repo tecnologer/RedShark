@@ -439,6 +439,7 @@ function getNumberSong(opcion)
 */
 function showList()
 {
+	$('#listaCanciones').html("");
 
 	for(var $i=0;$i<$audios.length;$i++)
 	{
@@ -493,9 +494,6 @@ function markSongOfList(anterior)
 	$('#cancion_'+$actualSong).css("background",cFondo);
 	$('#cancion_'+$actualSong).focus();
 
-	// console.log($('#cancion_'+$actualSong).position().top);
-	// $('#listaCanciones').stop().animate({ scrollTop: $('#listaCanciones')[$actualSong].scrollHeight }, 800);
-	$('#listaCanciones').stop().animate({ scrollTop: 0 }, 800);
 	$('#listaCanciones').stop().animate({ scrollTop: $('#cancion_'+$actualSong).position().top-123 }, 800);
 }
 
