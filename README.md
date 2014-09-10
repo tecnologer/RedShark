@@ -14,7 +14,9 @@ Faltantes:
 - Listas de reproduccion personalizadas
 - Guardar las listas
 - En Safari no funcion la etiqueta AUDIO de HTML5
-- Ver la lista de reproduccion
+- Ver la lista de reproduccion (completado)
+- Crear log de errores
+- Compartir canciones por medio de link
 
 Errores:
 - No todos pueden subir archivos aun, hay error en php 
