@@ -135,7 +135,9 @@ BEGIN
 	WHERE
 		c.id_artista = al.id_artista AND 
 		c.id_album = al.id_album AND
-		c.id_artista=a.id_Artista;
+		c.id_artista=a.id_Artista
+	ORDER BY
+		a.nb_artista ASC, al.nb_album ASC, c.nb_cancion ASC;
 END
 ;;
 DELIMITER ;

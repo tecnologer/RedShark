@@ -24,10 +24,14 @@
 		}*/
 		while($row = mysqli_fetch_array($result)){
 			$cancion='{
+				"id_cancion":'.$row[2].',
 				"nombre": "'.$row[3].'",
+				"id_artista":'.$row[0].',
 			    "artista": "'.$row[6].'",
 			    "archivo":"'.$row[7].'",
-			    "album":"'.$row[5].'"
+			    "id_album":'.$row[1].',
+			    "album":"'.$row[5].'",
+			    "isCheck":true
 			}';
 
 			$json.=$cancion;

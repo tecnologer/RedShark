@@ -23,7 +23,7 @@
 	text-align: center !important;
 }
 
-.back, .play, .pause, .next, .stop, #div_reload, .shuffle_off, .shuffle_on, .repeat_off, .repeat_all, .repeat_one{
+.back, .play, .pause, .next, .stop, .reload, .reloadOff, .shuffle_off, .shuffle_on, .repeat_off, .repeat_all, .repeat_one{
 	display: block;
     background: url(../img/sprite.png) no-repeat;
     height: 30px;
@@ -33,7 +33,7 @@
     cursor: hand;
 }
 
-#div_reload{
+.reload{
 	background-position: -313px 0px;
 	width: 35px !important;
 }
@@ -82,7 +82,17 @@
 }
 
 .repeat_one{
-	background-position: -502px 0px;
+	background-position: -500px 0px;
+}
+
+.reloadOff{
+	background-position: -545px 0px;
+	width: 35px !important;
+	cursor: wait !important;
+}
+
+.noRepetir{
+	text-decoration: overline line-through underline;
 }
 
 body {
@@ -147,3 +157,21 @@ body {
 .divCancionPlay:hover { 
 	background: #b9c9fe;
 }
+table thead{
+	position: static;
+}
+
+table thead tr{
+  font-family: Arial, monospace;
+  font-size: 14px;
+}
+
+table thead tr th{
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  margin: 0px;
+  padding: 2px;
+  background-color: #E1EEf4;
+}
+
+

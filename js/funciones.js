@@ -2,10 +2,11 @@
 var $totalSongs=20;
 
 var $fotosPorSesion=30;
-
+var $isMark=false;
 var $photos=new Array();
-var $audios;
-var $actualSong=0;
+var $audios=[];
+var $playList=[];
+var $actualSong=-1;
 var $actualSongShuffle=0;
 var $repeat=0;
 //arreglo de canciones que han sido reproducidas random
@@ -18,13 +19,20 @@ var $timer="";
 */
 function __init__()
 {
-	getSongs();
+	//asigna acciones a los botones de interfaz
 	$( "#id_play" ).bind( "click", function() {playSong();});
 	$( "#id_back" ).bind( "click", function() {backSong();});
 	$( "#id_next" ).bind( "click", function() {nextSong();});
-	// $( "#div_shuffle" ).bind( "click", function() {shuffle();});
+	$( "#div_shuffle" ).bind( "click", function() {shuffle();});
 	$( "#id_repeat" ).bind( "click", function() {repeat();});
+	$('.reload').bind( "click", function() {getSongs();});
+	$( "#chkAll" ).bind( "click", function() {selectAll();});
+	
+	//obtenemos la lista de canciones
+	getSongs();
 
+	
+	//verificamos si la cancion ha terminado
 	$('#tag_audio').bind('ended', function(){
 
 		//si no se repetira la lista
@@ -54,6 +62,8 @@ function __init__()
 
 		//hotkeys
 		$(document).bind('keyup', function(e) {
+
+		   //accesos directos que solo se permiten cuando ningun elemento tiene el focus
 		   if (!$("input").is(":focus")) 
 		    {
 			  	//console.log(e.keyCode);
@@ -61,7 +71,9 @@ function __init__()
 
 			  	switch(e.keyCode)
 			  	{
-			  		case 32: //espacio (play-pausa)
+			  		case 32: //tecla espacio 
+			  		case 179://tecla play (Teclado Vorago KB500)
+			  			//play-pausa
 			  			playSong();
 			  		break;
 			  		case 66://tecla B (back)
@@ -70,30 +82,76 @@ function __init__()
 			  		case 78: //tecla N (next)
 			  			nextSong();
 			  		break;
-			  		case 113://tecla F2 (refrescar lista)
-			  			getSongs();
+			  		case 82://tecla R (repetir off-lista-cancion)
+			  			repeat();
+			  		break;
+			  		case 83://tecla S (encender-apagar shuffle)
+			  			shuffle();
 			  		break;
 			  		default:
 			  			console.log(e.keyCode);
 			  		break;
 			  	}
 			}
+
+			//accesos directos que pueden funcionar en cualquier parte de la pagina, tenga o no tenga algun elemento el focus
+			switch(e.keyCode)
+		  	{
+		  		case 113://tecla F2 (refrescar lista)
+		  			/*solo se refrescara la lista cuando el div reload tenga la clase "reload",
+		  			  esto para evitar demasiados llamados al server*/
+		  			if($('#div_reload').attr("class")=='reload')
+		  				getSongs();
+		  		break;
+		  		default:
+		  			console.log(e.keyCode);
+		  		break;
+		  	}
 		});
 
-}
+
+	var $totalChecked=$('input:checkbox[id^="chk_"]:checked').size();
+	var $totalCheckBox=$('input:checkbox[id^="chk_"]').size();
+	
+	if($totalChecked==$totalCheckBox)
+		$('#chkAll').prop('checked', true);
+
+}	
 
 /*Author: REY DAVID DOMINGUEZ
 	Muestra la lista de reproduccion
 */
 function getSongs()
 {
+	waitScreen();
+
+	$playList=$audios;
+
+	$('#div_reload').attr("class",'reloadOff');
+	$('#li_rep').attr("class",'noRepetir');
+
 	$.ajax({
         data: {},
         url:   'componentes/funciones/ObtenerCanciones.php',
         type:  'post',
         success:  function (data) {                
             $audios=$.parseJSON(data);
-            showList();
+            
+            //si la lista de reproduccion actual tiene diferente numero de canciones
+            //refrescamos la lista en el DOM
+            if($playList.length!=$audios.length)
+            {
+            	persistenciaLista();
+            	showList();
+            }
+
+            waitScreen();
+
+            var $timer=setInterval(function(){
+            	clearInterval($timer);
+            	$('#div_reload').attr("class",'reload');
+            	$('#li_rep').attr("class",'');
+            },5000);
         }
 	});
 }
@@ -107,7 +165,10 @@ function playSong(_repeat)
 	if(_repeat)
 	{
 		if($('#tag_audio').attr("src")=="" || !$('#tag_audio').attr("src"))
-		{
+		{	
+			if($actualSong<0)
+				getNumberSong(2);
+
 			$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 			$('#tag_audio').load();
 		}
@@ -124,8 +185,18 @@ function playSong(_repeat)
 
 		if($('#tag_audio').attr("src")=="" || !$('#tag_audio').attr("src"))
 		{
+			if($actualSong<0)
+				getNumberSong(2);
+
 			$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 			$('#tag_audio').load();
+		}
+
+		if(!isChecked($actualSong))
+		{
+			var anterior=$actualSong;
+			markSongOfList(anterior);
+			getNumberSong(2);
 		}
 
 	 	$('#tag_audio')[0].play();
@@ -188,7 +259,6 @@ function backSong()
 	$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 	$('#tag_audio').load();
 	$('#tag_audio')[0].play();
-
 	showDataSong();
 
 	$( "#id_play" ).removeClass( "play" );
@@ -203,12 +273,39 @@ function showDataSong()
 	$('#nb_cancion').html($audios[$actualSong].nombre);
 	$('#nb_artista').html($audios[$actualSong].artista);
 	
+	// document.title=$audios[$actualSong].nombre;
+	nSongTab();
+
 	if($audios[$actualSong].album!='Default')
 		$('#nb_album').html($audios[$actualSong].album);
 	else
 		$('#nb_album').html("");
 }
+/*Author: REY DAVID DOMINGUEZ
+	Muestra la informacion de la cancion actual en el tab del navegador
+*/
+function nSongTab()
+{
+	var i=0;
+	var $inter=setInterval(function(){
+		var $nb_song="  "+$audios[$actualSong].nombre+' - '+$audios[$actualSong].artista;
+		document.title = $nb_song.substring(i,$nb_song.length);
+		
+		if (i<=$nb_song.length)
+			i++;
+		else
+		{
+			clearInterval($inter);
+			document.title ='RedShark';
+			var $inter2=setInterval(function(){
+				clearInterval($inter2);
+				nSongTab();
+			},1500);
+			
+		}
 
+	},120);
+}
 /*Author: REY DAVID DOMINGUEZ
 	Sube la cancion a la db
 */
@@ -431,6 +528,8 @@ function getNumberSong(opcion)
 		$shuffleSong=[];
 	}
 
+	if(!isChecked($actualSong))
+		getNumberSong(opcion);
 }
 
 /*Author: REY DAVID DOMINGUEZ
@@ -439,26 +538,42 @@ function getNumberSong(opcion)
 */
 function showList()
 {
-	$('#listaCanciones').html("");
-
+	// $('#listaCanciones').html("");
+	$('#tbody').html("");
+	var $table='<table width="100%">';
 	for(var $i=0;$i<$audios.length;$i++)
 	{
 		var clase="divCancion";
 		if(($i%2)==0)
 			clase="divCancionAlt";
+		var $check='<input type="checkbox" id="chk_'+$i+'" name="chk_'+$i+'" checked>';
+		var $hdn='<input type="hidden" id="idArtista_'+$i+'" value="'+$audios[$i].id_artista+'">';
+			$hdn+='<input type="hidden" id="idAlbum_'+$i+'" value="'+$audios[$i].id_album+'">';
+			$hdn+='<input type="hidden" id="idCancion_'+$i+'" value="'+$audios[$i].id_cancion+'">';
 
-		var $divCancion='<div id="cancion_'+$i+'" draggable="true" class="'+clase+'">'+$audios[$i].nombre+' - '+$audios[$i].artista+'</div>';
-		
-		$('#listaCanciones').append($divCancion);
+		// var $divCancion='<div id="cancion_'+$i+'" draggable="true" class="'+clase+'">'+$audios[$i].nombre+' - '+$audios[$i].artista+$check+'</div>';
+		var $tr='<tr id="cancion_'+$i+'" draggable="true" class="'+clase+'">'
+					+'<td>'+$hdn+$audios[$i].nombre+'</td>'
+					+'<td>'+$audios[$i].artista+'</td>'
+					+'<td align="center">'+$check+'</td>'
+				+'</tr>';
+		// $('#listaCanciones').append($divCancion);
+		$('#tbody').append($tr);
 
 		// $('#cancion_'+$i).addEventListener('dragstart', handleDragStart, false);
 	}
 
-	$('div[id^="cancion_"]').dblclick(function() {
+	markSongOfList();
+
+	$('tr[id^="cancion_"]').dblclick(function() {
+
 
 		var anterior=$actualSong;
 		$actualSong=parseInt((this.id).split("_")[1]);		
 		markSongOfList(anterior);
+
+
+		$('#chk_'+$actualSong).prop('checked',true);
 
 		$('#tag_audio').attr("src","audio_php/"+$audios[$actualSong].archivo);
 		$('#tag_audio').load();
@@ -466,6 +581,7 @@ function showList()
 		showDataSong();
 		$( "#id_play" ).attr( "class","pause" );
 	});
+	$('input:checkbox[id^="chk_"]').bind('click',function(){unCheckAll(this);});
 }
 
 /*Author: REY DAVID DOMINGUEZ
@@ -474,29 +590,111 @@ function showList()
 */
 function markSongOfList(anterior)
 {
-	//clase para cancion normal
-	var clase="divCancion";
-	var cFondo='';
+	if(!isNaN(anterior))
+	{
+		//clase para cancion normal
+		var clase="divCancion";
+		var cFondo='';
 
-	//si es un numero par, cambiamos de clase para que se marque de diferente color
-	if((anterior%2)==0)
-		clase='divCancionAlt';
+		//si es un numero par, cambiamos de clase para que se marque de diferente color
+		if((anterior%2)==0)
+			clase='divCancionAlt';
 
-	//si la cancion actual es par, le ponemos fondo diferente junto con el color
-	if(($actualSong%2)==0)
-		cFondo='#E1EEf4';
+		//si la cancion actual es par, le ponemos fondo diferente junto con el color
+		if(($actualSong%2)==0)
+			cFondo='#E1EEf4';
 
-	//quitamos el color diferente de cancion actual a la cancion que se estaba reproduciendo
-	$('#cancion_'+anterior).attr('class',clase);
+		//quitamos el color diferente de cancion actual a la cancion que se estaba reproduciendo
+		$('#cancion_'+anterior).attr('class',clase);
 
-	//marcamos con color diferente la cancion que se reproducira actualmente
-	$('#cancion_'+$actualSong).attr("class","divCancionPlay");
-	$('#cancion_'+$actualSong).css("background",cFondo);
-	$('#cancion_'+$actualSong).focus();
+		//marcamos con color diferente la cancion que se reproducira actualmente
+		$('#cancion_'+$actualSong).attr("class","divCancionPlay");
+		$('#cancion_'+$actualSong).css("background",cFondo);
+		$('#cancion_'+$actualSong).focus();
 
-	$('#listaCanciones').stop().animate({ scrollTop: $('#cancion_'+$actualSong).position().top-123 }, 800);
+		// console.log($('#cancion_'+$actualSong).position().top);
+		$('#listaCanciones').stop().animate({ scrollTop: $('#cancion_'+$actualSong).position().top }, 800);
+	}
 }
 
 function handleDragStart(){
 	console.log("Viene, viene");
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+	Muestra un pantalla de espera
+*/
+function waitScreen(){
+	$('#divBloqueo').toggle();
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+	verifica si la cancion (num) esta seleccionada
+*/
+function isChecked(num){
+	return $('#chk_'+num).is(':checked');
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+	Al precionar el checkbox del header, selecciona todos los checkbox de la columna
+*/
+function selectAll()
+{
+	if($('#chkAll').is(':checked'))
+		$('input:checkbox[id^="chk_"]').prop('checked',true);
+	else
+		$('input:checkbox[id^="chk_"]').prop('checked',false);
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+  Cuando se da click en un check indenpendiente (los de las canciones), 
+  verifica si es necesario seleccionar el check general
+*/
+function unCheckAll(checkbox)
+{
+	if(!$(checkbox).is(':checked'))
+		$( "#chkAll" ).prop('checked',false);
+	else
+	{
+		var $totalChecked=$('input:checkbox[id^="chk_"]:checked').size();
+		var $totalCheckBox=$('input:checkbox[id^="chk_"]').size();
+		
+		if($totalChecked==$totalCheckBox)
+			$('#chkAll').prop('checked', true);
+		else
+			$('#chkAll').prop('checked', false);
+	}
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+  Busca cambios en la lista de reproduccion, conservando el estado de las canciones seleccionadas
+  al actualizar la lista
+*/
+function persistenciaLista()
+{
+	for(var $i=0;$i<$audios.length;$i++)
+	{
+		var $posPL=indexOfCanciones($playList,$audios[$i].id_artista, $audios[$i].id_album, $audios[$i].id_album);
+		if($posPL!=-1)
+			$audios[$i].isCheck=$playList[$posPL].isCheck;
+
+	}
+}
+/*Author: REY DAVID DOMINGUEZ
+  Date: 10/09/2014
+  Busca el indice de la cancion, filtrando por:
+  	artista(idArt),  
+  	album (idAlb),
+  	cancion (idCan).
+  Si no lo encuentra regresa un -1.
+*/
+function indexOfCanciones(canciones,idArt, idAlb, idCan)
+{
+	for(var $i=0;$i<canciones.length;$i++)
+	{
+		if(canciones[$i].id_artista==idArt && canciones[$i].id_album==idAlb && canciones[$i].id_cancion==idCan)
+			return $i;
+	}
+
+	return -1;
 }
