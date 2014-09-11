@@ -50,18 +50,23 @@
 						<li type="disc"><b>S:</b> Shuffle</li>
 					</ul>
 				</div>
-				<div id="listaCanciones" class="songList">
-					<table width="100%">
-						<thead>
-							<tr>
-								<th>Canci&oacute;n</th>
-								<th>Artista</th>
-								<th>Reproducir<br> <input type="checkbox" id="chkAll"></th>
-							</tr>
-						</thead>
-						<tbody id="tbody">
-						</tbody>
-					</table>
+				<div class="songList">
+					<input type="text" id="filtro" placeholder="Filtrar" class="todo-search-field" style="width: 85%;height:20px;">
+					<br><label><input type="checkbox" id="chkVerSeleccionadas">&nbsp;&nbsp;Ver solo seleccionados</label>
+					<br>
+					<div id="listaCanciones" >
+						<table width="100%">
+							<thead>
+								<tr>
+									<th>Canci&oacute;n</th>
+									<th>Artista</th>
+									<th>Reproducir?<br> <input type="checkbox" id="chkAll"></th>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 			<br>
@@ -116,7 +121,7 @@
 
 			<div id="footer">
 				<span style="float:left;width:250px;"><b>Author:</b> Rey David Dominguez<br></span><br>
-				<span style="float:right;width:150px;"><b>Version:</a>&nbsp;0.0.3</span>
+				<span style="float:right;width:150px;"><b>Version:</a>&nbsp;0.0.4</span>
 				<span style="float:none;width:280px;"><b>&nbsp;&nbsp;Email:</b> <a href="mailto:rdominguez@tecnologer.net">rdominguez@tecnologer.net</a></span>
 			</div>
 		</form>

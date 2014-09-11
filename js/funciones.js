@@ -110,12 +110,14 @@ function __init__()
 		});
 
 
-	var $totalChecked=$('input:checkbox[id^="chk_"]:checked').size();
-	var $totalCheckBox=$('input:checkbox[id^="chk_"]').size();
+	var $totalChecked=$('input:checkbox[id^="chk_"]:checked').filter(':visible').size();
+	var $totalCheckBox=$('input:checkbox[id^="chk_"]').filter(':visible').size();
 	
 	if($totalChecked==$totalCheckBox)
 		$('#chkAll').prop('checked', true);
 
+	$('#filtro').bind('keyup',function(){filtrarLista();});	
+	$("#chkVerSeleccionadas" ).bind( "click", function() {verSeleccionados();});
 }	
 
 /*Author: REY DAVID DOMINGUEZ
@@ -529,7 +531,12 @@ function getNumberSong(opcion)
 	}
 
 	if(!isChecked($actualSong))
-		getNumberSong(opcion);
+	{
+		if($('input:checkbox[id^="chk_"]:checked').size()>0)
+			getNumberSong(opcion);
+		else
+			return;
+	}
 }
 
 /*Author: REY DAVID DOMINGUEZ
@@ -546,7 +553,12 @@ function showList()
 		var clase="divCancion";
 		if(($i%2)==0)
 			clase="divCancionAlt";
-		var $check='<input type="checkbox" id="chk_'+$i+'" name="chk_'+$i+'" checked>';
+
+		var $checked='';
+		if($audios[$i].isCheck)
+			$checked='checked';
+
+		var $check='<input type="checkbox" id="chk_'+$i+'" name="chk_'+$i+'" '+$checked+'>';
 		var $hdn='<input type="hidden" id="idArtista_'+$i+'" value="'+$audios[$i].id_artista+'">';
 			$hdn+='<input type="hidden" id="idAlbum_'+$i+'" value="'+$audios[$i].id_album+'">';
 			$hdn+='<input type="hidden" id="idCancion_'+$i+'" value="'+$audios[$i].id_cancion+'">';
@@ -641,9 +653,12 @@ function isChecked(num){
 function selectAll()
 {
 	if($('#chkAll').is(':checked'))
-		$('input:checkbox[id^="chk_"]').prop('checked',true);
+		$('input:checkbox[id^="chk_"]').filter(':visible').prop('checked',true);
 	else
-		$('input:checkbox[id^="chk_"]').prop('checked',false);
+		$('input:checkbox[id^="chk_"]').filter(':visible').prop('checked',false);
+
+	for(var $i=0;$i<$audios.length;$i++)
+		$audios[$i].isCheck=$("#chk_"+$i).is(':checked');
 }
 /*Author: REY DAVID DOMINGUEZ
   Date: 10/09/2014
@@ -656,14 +671,18 @@ function unCheckAll(checkbox)
 		$( "#chkAll" ).prop('checked',false);
 	else
 	{
-		var $totalChecked=$('input:checkbox[id^="chk_"]:checked').size();
-		var $totalCheckBox=$('input:checkbox[id^="chk_"]').size();
+		var $totalChecked=$('input:checkbox[id^="chk_"]:checked').filter(':visible').size();
+		var $totalCheckBox=$('input:checkbox[id^="chk_"]').filter(':visible').size();
 		
 		if($totalChecked==$totalCheckBox)
 			$('#chkAll').prop('checked', true);
 		else
 			$('#chkAll').prop('checked', false);
 	}
+
+	var $s=(checkbox.id).split("_")[1];
+
+	$audios[$s].isCheck=$(checkbox).is(':checked');
 }
 /*Author: REY DAVID DOMINGUEZ
   Date: 10/09/2014
@@ -697,4 +716,53 @@ function indexOfCanciones(canciones,idArt, idAlb, idCan)
 	}
 
 	return -1;
+}
+
+function filtrarLista()
+{
+	var $filtro=$('#filtro').val();
+		$filtro=$filtro.toUpperCase();
+	for(var $i=0;$i<$audios.length;$i++)
+	{
+		
+		var $nbCan=(""+$audios[$i].nombre).toUpperCase();
+		var $nbArt=(""+$audios[$i].artista).toUpperCase();
+
+		if($i==127)
+			console.log($nbCan.indexOf($filtro));
+
+		if($nbCan.indexOf($filtro)>-1 || $nbArt.indexOf($filtro)>-1)
+			$('#cancion_'+$i).css("display",'');
+		else
+			$('#cancion_'+$i).css("display",'none');
+	}
+
+	var $totalChecked=$('input:checkbox[id^="chk_"]:checked').filter(':visible').size();
+	var $totalCheckBox=$('input:checkbox[id^="chk_"]').filter(':visible').size();
+	
+	if($totalChecked==$totalCheckBox)
+		$('#chkAll').prop('checked', true);
+	else
+		$('#chkAll').prop('checked', false);
+
+	// verSeleccionados();
+}
+
+function verSeleccionados()
+{
+	if($('#chkVerSeleccionadas').is(':checked'))
+		for(var $i=0;$i<$audios.length;$i++)
+		{
+			if($('#chk_'+$i).is(":checked"))
+				$('#cancion_'+$i).css("display",'');
+			else
+				$('#cancion_'+$i).css("display",'none');
+		}
+	else
+	{
+		for(var $i=0;$i<$audios.length;$i++)
+		{
+			$('#cancion_'+$i).css("display",'');
+		}
+	}
 }
