@@ -116,8 +116,8 @@ function __init__()
 	if($totalChecked==$totalCheckBox)
 		$('#chkAll').prop('checked', true);
 
-	$('#filtro').bind('keyup',function(){filtrarLista();});	
-	$("#chkVerSeleccionadas" ).bind( "click", function() {verSeleccionados();});
+	$('#filtro').bind('keyup',function(){listFilter();});	
+	$("#chkVerSeleccionadas" ).bind( "click", function() {showSelected();});
 }	
 
 /*Author: REY DAVID DOMINGUEZ
@@ -143,7 +143,7 @@ function getSongs()
             //refrescamos la lista en el DOM
             if($playList.length!=$audios.length)
             {
-            	persistenciaLista();
+            	listPersistence();
             	showList();
             }
 
@@ -628,10 +628,6 @@ function markSongOfList(anterior)
 		$('#listaCanciones').stop().animate({ scrollTop: $('#cancion_'+$actualSong).position().top }, 800);
 	}
 }
-
-function handleDragStart(){
-	console.log("Viene, viene");
-}
 /*Author: REY DAVID DOMINGUEZ
   Date: 10/09/2014
 	Muestra un pantalla de espera
@@ -689,11 +685,11 @@ function unCheckAll(checkbox)
   Busca cambios en la lista de reproduccion, conservando el estado de las canciones seleccionadas
   al actualizar la lista
 */
-function persistenciaLista()
+function listPersistence()
 {
 	for(var $i=0;$i<$audios.length;$i++)
 	{
-		var $posPL=indexOfCanciones($playList,$audios[$i].id_artista, $audios[$i].id_album, $audios[$i].id_album);
+		var $posPL=indexOfSongs($playList,$audios[$i].id_artista, $audios[$i].id_album, $audios[$i].id_album);
 		if($posPL!=-1)
 			$audios[$i].isCheck=$playList[$posPL].isCheck;
 
@@ -707,7 +703,7 @@ function persistenciaLista()
   	cancion (idCan).
   Si no lo encuentra regresa un -1.
 */
-function indexOfCanciones(canciones,idArt, idAlb, idCan)
+function indexOfSongs(canciones,idArt, idAlb, idCan)
 {
 	for(var $i=0;$i<canciones.length;$i++)
 	{
@@ -717,8 +713,11 @@ function indexOfCanciones(canciones,idArt, idAlb, idCan)
 
 	return -1;
 }
-
-function filtrarLista()
+/*Author: REY DAVID DOMINGUEZ
+  Date: 11/09/2014
+  Busca la cancion o artista que contengan el criterio de busqueda
+*/
+function listFilter()
 {
 	var $filtro=$('#filtro').val();
 		$filtro=$filtro.toUpperCase();
@@ -745,10 +744,13 @@ function filtrarLista()
 	else
 		$('#chkAll').prop('checked', false);
 
-	// verSeleccionados();
+	// showSelected();
 }
-
-function verSeleccionados()
+/*Author: REY DAVID DOMINGUEZ
+  Date: 11/09/2014
+  Muestra solo las canciones que esten seleccionadas
+*/
+function showSelected()
 {
 	if($('#chkVerSeleccionadas').is(':checked'))
 		for(var $i=0;$i<$audios.length;$i++)
